@@ -29,27 +29,21 @@ def merge_regions_and_departments(regions, departments):
     The columns in the final DataFrame should be:
     ['code_reg', 'name_reg', 'code_dep', 'name_dep']
     """
-    regions = regions.copy()
-    departments = departments.copy()
+    regions_renamed = regions[["code", "name"]].rename(
+        columns={"code": "code_reg", "name": "name_reg"})
+    departments_renamed = departments[["region_code", "code", "name"]]
+    departments_renamed.rename(columns={"region_code": "code_reg",
+                                        "code": "code_dep",
+                                        "name": "name_dep"},
+                               inplace=True)
 
-    regions["code"] = regions["code"].astype(str)
-    departments["region_code"] = departments["region_code"].astype(str)
-
-    regions_df = regions.rename(columns={
-        "code": "code_reg", "name": "name_reg"}), [["code_reg", "name_reg"]]
-
-    departments_df = departments.rename(
-        columns={"code": "code_dep", "name": "name_dep"}
-    )[["region_code", "code_dep", "name_dep"]]
-
-    merged = departments_df.merge(
-        regions_df,
-        left_on="region_code",
-        right_on="code_reg",
-        how="left",
+    regions_and_departments = regions_renamed.merge(
+        departments_renamed,
+        on='code_reg',
+        how='inner'
     )
 
-    return merged[["code_reg", "name_reg", "code_dep", "name_dep"]]
+    return regions_and_departments
 
 
 def merge_referendum_and_areas(referendum, regions_and_departments):
@@ -64,8 +58,8 @@ def merge_referendum_and_areas(referendum, regions_and_departments):
     ref = referendum.copy()
     regs_deps = regions_and_departments.copy()
 
-    regs_deps["code_dep_str"] = regs_deps[
-        "code_dep"].astype(str).str.lstrip("0")
+    regs_deps["code_dep_str"] = \
+        regs_deps["code_dep"].astype(str).str.lstrip("0")
     ref["code_dep_str"] = ref["Department code"].astype(str)
 
     merged = ref.merge(
@@ -181,9 +175,8 @@ if __name__ == "__main__":
     referendum_and_areas = merge_referendum_and_areas(
         referendum, regions_and_departments
     )
-    referendum_results = compute_referendum_result_by_regions(
-        referendum_and_areas
-    )
+    referendum_results = \
+        compute_referendum_result_by_regions(referendum_and_areas)
     print(referendum_results)
     plot_referendum_map(referendum_results)
     plt.show()
