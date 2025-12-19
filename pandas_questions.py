@@ -13,6 +13,7 @@ import pandas as pd
 import geopandas as gpd
 import matplotlib.pyplot as plt
 
+
 def load_data():
     """Load data from the CSV files referundum/regions/departments."""
     referendum = pd.read_csv("data/referendum.csv", sep=";")
@@ -34,9 +35,8 @@ def merge_regions_and_departments(regions, departments):
     regions["code"] = regions["code"].astype(str)
     departments["region_code"] = departments["region_code"].astype(str)
 
-    regions_df = regions.rename(columns={"code": "code_reg", "name": "name_reg"})[
-        ["code_reg", "name_reg"]
-    ]
+    regions_df = regions.rename(columns={
+        "code": "code_reg", "name": "name_reg"}), [["code_reg", "name_reg"]]
 
     departments_df = departments.rename(
         columns={"code": "code_dep", "name": "name_dep"}
@@ -64,7 +64,8 @@ def merge_referendum_and_areas(referendum, regions_and_departments):
     ref = referendum.copy()
     regs_deps = regions_and_departments.copy()
 
-    regs_deps["code_dep_str"] = regs_deps["code_dep"].astype(str).str.lstrip("0")
+    regs_deps["code_dep_str"] = regs_deps[
+        "code_dep"].astype(str).str.lstrip("0")
     ref["code_dep_str"] = ref["Department code"].astype(str)
 
     merged = ref.merge(
@@ -180,7 +181,9 @@ if __name__ == "__main__":
     referendum_and_areas = merge_referendum_and_areas(
         referendum, regions_and_departments
     )
-    referendum_results = compute_referendum_result_by_regions(referendum_and_areas)
+    referendum_results = compute_referendum_result_by_regions(
+        referendum_and_areas
+    )
     print(referendum_results)
     plot_referendum_map(referendum_results)
     plt.show()
