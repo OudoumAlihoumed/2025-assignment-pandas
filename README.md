@@ -24,5 +24,5 @@
   - When it is green, put the link to the PR in the course's spreadsheet.
 
 ## Getting Help
-
+ 
 If you need help ask on the Slack of the DataCamp course.
